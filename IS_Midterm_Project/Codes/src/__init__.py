@@ -1,0 +1,1 @@
+"""Campus event classification backend."""
