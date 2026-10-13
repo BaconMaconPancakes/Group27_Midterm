@@ -23,7 +23,14 @@ class InputValidationError(ValueError):
 def _bundle() -> dict:
     if not MODEL_PATH.is_file():
         raise FileNotFoundError(f"Trained model is missing: {MODEL_PATH}. Run python -m src.train first.")
-    return joblib.load(MODEL_PATH)
+    bundle = joblib.load(MODEL_PATH)
+
+    # scikit-learn 1.9 models may omit this attribute, but older runtimes
+    # still access it while calculating predict_proba().
+    classifier = bundle["pipeline"].steps[-1][1]
+    if classifier.__class__.__name__ == "LogisticRegression" and not hasattr(classifier, "multi_class"):
+        classifier.multi_class = "auto"
+    return bundle
 
 
 def load_model():

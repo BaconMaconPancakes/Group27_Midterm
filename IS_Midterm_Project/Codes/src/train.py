@@ -30,9 +30,17 @@ def train() -> pd.DataFrame:
     frame, validation = load_and_validate_dataset(DATASET)
     features = frame.loc[:, list(FEATURE_COLUMNS)]
     target = frame[TARGET_COLUMN]
-    train_x, test_x, train_y, test_y = train_test_split(
-        features, target, test_size=0.25, stratify=target, random_state=RANDOM_STATE
-    )
+
+    #added for knime continuity
+    train_frame = pd.read_csv(ROOT / "data" / "knime_train.csv")
+    test_frame = pd.read_csv(ROOT / "data" / "knime_test.csv")
+
+    train_x = train_frame.loc[:, list(FEATURE_COLUMNS)]
+    train_y = train_frame[TARGET_COLUMN]
+
+    test_x = test_frame.loc[:, list(FEATURE_COLUMNS)]
+    test_y = test_frame[TARGET_COLUMN]
+    
     models = {
         "logistic_regression": lambda: LogisticRegression(max_iter=2000, random_state=RANDOM_STATE),
         "decision_tree": lambda: DecisionTreeClassifier(max_depth=4, min_samples_leaf=2, random_state=RANDOM_STATE),
